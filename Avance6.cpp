@@ -821,6 +821,7 @@ void moverAlfil(int iCord , int jCord, coordenadas *options){
             options[counter].y = jCordTemp;
             counter++;
         }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCord])){
+		check = 0;
         }else{
             options[counter].x = iCordTemp;
             options[counter].y = jCordTemp;
@@ -1109,6 +1110,7 @@ void moverReina(int iCord , int jCord, coordenadas *options){
             options[counter].y = jCordTemp;
             counter++;
         }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCord])){
+		check = 0;
         }else{
             options[counter].x = iCordTemp;
             options[counter].y = jCordTemp;
