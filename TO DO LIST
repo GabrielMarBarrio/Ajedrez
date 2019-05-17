@@ -5,3 +5,4 @@ Cosas por hacer:
 4.- Terminar la interfaz
 5.- Implementar cuando un peon llegue al extremo opuesto cambiarlo por otra pieza cualesquiera que se haya comido el jugador enemigo.
 6.- Implementar un timer, de prefenrencia con concurrencia.
+7.- Documentación
