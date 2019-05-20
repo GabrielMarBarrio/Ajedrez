@@ -388,7 +388,12 @@ void moverTorre(int iCord , int jCord, coordenadas *options){
     if(eleccion != 0){ /** si introducen 0 cancelan su jugada **/
         arr[options[eleccion-1].x][options[eleccion-1].y] = arr[iCord][jCord];
         arr[iCord][jCord] = 0;
-
+    }else{
+        cout << "Has cancelado la jugada" << endl;
+        system("pause");
+        system("cls");
+        board_set();
+        moverPieza(options);
     }
 }
 
@@ -520,7 +525,12 @@ void moverCaballo(int iCord , int jCord, coordenadas *options){
     if(eleccion != 0){ /** si introducen 0 cancelan su jugada **/
         arr[options[eleccion-1].x][options[eleccion-1].y] = arr[iCord][jCord];
         arr[iCord][jCord] = 0;
-
+    }else{
+        cout << "Has cancelado la jugada" << endl;
+        system("pause");
+        system("cls");
+        board_set();
+        moverPieza(options);
     }
 
 }
@@ -528,8 +538,8 @@ void moverCaballo(int iCord , int jCord, coordenadas *options){
 void inicializarTablero(){
     arr[8][8] = {};
     for(int i = 0 ; i < 8 ; i++){ /*Peones*/                   /**1 peon - 2 torre - 3 caballo**/
-        arr[1][i] = -1;                                        /** 4 alfin - 5 reina -  6 rey **/
-        arr[6][i] = 1;
+       // arr[1][i] = -1;                                        /** 4 alfin - 5 reina -  6 rey **/
+        //arr[6][i] = 1;
     }
     arr[0][0] = arr[0][7] = -2;
     arr[0][1] = arr[0][6] = -3;
@@ -798,6 +808,12 @@ void moverPeon(int iCord , int jCord, coordenadas *options){
         arr[options[eleccion-1].x][options[eleccion-1].y] = arr[iCord][jCord];
         arr[iCord][jCord] = 0;
 
+    }else{
+        cout << "Has cancelado la jugada" << endl;
+        system("pause");
+        system("cls");
+        board_set();
+        moverPieza(options);
     }
 
 }
@@ -932,6 +948,12 @@ void moverAlfil(int iCord , int jCord, coordenadas *options){
         arr[options[eleccion-1].x][options[eleccion-1].y] = arr[iCord][jCord];
         arr[iCord][jCord] = 0;
 
+    }else{
+        cout << "Has cancelado la jugada" << endl;
+        system("pause");
+        system("cls");
+        board_set();
+        moverPieza(options);
     }
 
 }
@@ -1033,7 +1055,6 @@ void moverReina(int iCord , int jCord, coordenadas *options){
     iCordTemp = iCord;
     jCordTemp = jCord;
     check = 1;
-
     while(check){ /** Movimiento hacia abajo**/
         iCordTemp++;
         if(iCordTemp > 7){
@@ -1154,6 +1175,12 @@ void moverReina(int iCord , int jCord, coordenadas *options){
         arr[options[eleccion-1].x][options[eleccion-1].y] = arr[iCord][jCord];
         arr[iCord][jCord] = 0;
 
+    }else{
+        cout << "Has cancelado la jugada" << endl;
+        system("pause");
+        system("cls");
+        board_set();
+        moverPieza(options);
     }
 }
 
