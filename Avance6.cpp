@@ -5,7 +5,8 @@
 #include <string>
 
 //esto es otra prueba
-using namespace std;
+using namespace std;h
+
 //Estructuras
 struct coordenadas{
     int x;
