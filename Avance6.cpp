@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <string>
 
-//esto es una prueba
 
 using namespace std;
 //Estructuras
