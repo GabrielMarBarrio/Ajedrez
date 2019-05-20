@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <string>
 
-
+//esto es otra prueba
 using namespace std;
 //Estructuras
 struct coordenadas{
