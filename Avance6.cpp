@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <string>
 
+//esto es una prueba
+
 using namespace std;
 //Estructuras
 struct coordenadas{
@@ -1186,5 +1188,3 @@ void moverReina(int iCord , int jCord, coordenadas *options){
 
 void moverRey(int iCord , int jCord, coordenadas *options){
 }
-
-
