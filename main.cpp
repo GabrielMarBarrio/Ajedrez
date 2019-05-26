@@ -19,6 +19,10 @@
 #include <iomanip>
 #include <cstdlib>
 #include <string>
+#include <cstdio>
+#include <ctime>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 
@@ -35,11 +39,24 @@ struct coordenadas{
     int y;
 };
 int arr[8][8] = {};
+int arrTemp[8][8] = {};
 bool jaqueMate=false;
 int teamCount = 1;
 coordenadas *elecciones;
+coordenadas *eleccionesJaque;
 bool callCheck = 0;
 int checkCount = 0;
+
+/**
+ *
+ * Variables de hilos y funciones afin
+ *
+**/
+
+std::clock_t startBlancas;
+std::clock_t startNegras;
+double tiempoBlancas = 0;
+double tiempoNegras = 0;
 
 /**
  *  Funciones:
@@ -59,31 +76,53 @@ void moverCaballo(int iCord , int jCord, coordenadas *options);
 void moverAlfil(int iCord , int jCord, coordenadas *options);
 void moverReina(int iCord , int jCord, coordenadas *options);
 void moverRey(int iCord , int jCord, coordenadas *options);
-void checkCheck(coordenadas* options );
+bool checkCheck(coordenadas* options );
 bool piezaJaque(coordenadas* options,int iCord, int jCord, int reyX, int reyY);
+void igualarArrTemp();
+void igualarArr();
+void timesUp();
+void relojNegras();
+void relojBlancas();
 
 int main()
 {
+    system("pause");
     try{
     elecciones = new coordenadas[64];
+    eleccionesJaque = new coordenadas[64];
     }catch(...){
         cout << "Error fatal, el programa terminara";
     }
-
+    thread timer(timesUp);
     inicializarTablero();
-    board_set();
-
+    startBlancas = clock();
     do{
-    checkCheck(elecciones);
+    if(checkCheck(elecciones)){
+        if(teamCount%2 != 0){
+          cout << "CUIDADO: Las piezas blancas estan en jaque" << endl;
+          system("pause");
+          system("cls");
+        }else{
+          cout << "CUIDADO: Las piezas negras estan en jaque" << endl;
+          system("pause");
+          system("cls");
+        }
+    }
     board_set();
     moverPieza(elecciones);
     board_set();
     teamCount++;
+    if(teamCount % 2 != 0){
+        relojNegras();
+    }else{
+        relojBlancas();
+    }
     }while(!jaqueMate);
 
     system("pause");
 
     delete [] elecciones;
+    delete [] eleccionesJaque;
 
     return 0;
 }
@@ -179,9 +218,15 @@ void board_set(){
 	}
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
 	if(teamCount % 2 != 0){
-        cout << "Es turno de las piezas blancas" << endl;
+        tiempoBlancas = tiempoBlancas + ((clock() - startBlancas) / (double) CLOCKS_PER_SEC);
+        startBlancas = clock();
+        cout << "Es turno de las piezas blancas y les quedan " << 180.0-tiempoBlancas << " segundos" << endl;
+        cout << "Y a las negras " << 180.0-tiempoNegras << " segundos" << endl;
     }else{
-        cout << "Es turno de las piezas negras" << endl;
+        tiempoNegras = tiempoNegras + ((clock() - startNegras) / (double) CLOCKS_PER_SEC);
+        startNegras = clock();
+        cout << "Es turno de las piezas negras y les quedan " << 180.0-tiempoNegras << " segundos" << endl;
+        cout << "Y a las blancas " << 180.0-tiempoBlancas << " segundos" << endl;
     }
 }
 
@@ -189,6 +234,7 @@ void moverPieza(coordenadas *options){
     string tempX;
     int coorX=0, coorY=0;
     bool ban=false;
+    board_set();
     //Pide las coordenadas de la pieza a mover y verifica que sea coordenadas validas.
     do{
         try{
@@ -293,8 +339,8 @@ void moverPieza(coordenadas *options){
             break;
             default:
                 cout << "No existe pieza en esa coordenada" << endl;
-                teamCount--;
                 system("pause");
+                moverPieza(options);
         }
     }else{
         switch(arr[coorX][coorY]){ //Dependiendo de la pieza que desea mover llama la funcion correspondiente
@@ -336,8 +382,8 @@ void moverPieza(coordenadas *options){
             break;
             default:
                 cout << "No existe pieza en esa coordenada" << endl;
-                teamCount--;
                 system("pause");
+                moverPieza(options);
         }
     }
 
@@ -405,10 +451,10 @@ bool mismoEquipo(int piezaAMover, int piezaTope){
 
 void inicializarTablero(){
     arr[8][8] = {};
-    /**
+
     for(int i = 0 ; i < 8 ; i++){
-        arr[5][i] = -1;
-        arr[2][i] = -1;
+        arr[6][i] = 1;
+        arr[1][i] = -1;
     }
     arr[0][0] = arr[0][7] = -2;
     arr[0][1] = arr[0][6] = -3;
@@ -420,14 +466,7 @@ void inicializarTablero(){
     arr[7][2] = arr[7][5] = 4;
     arr[7][3] = 5;
     arr[7][4] = 6;
-    arr[5][1] = -1;
-    arr[2][1] = 1;
-    **/
-    //arr[3][3] = arr[3][4] = -2;
-    arr[4][3] = 6;
-    arr[3][4] = arr[3][3] = arr[3][2] = -1;
-    arr[0][0] = -6;
-    arr[7][0] = 2;
+
 }
 
 /**
@@ -567,7 +606,7 @@ void moverTorre(int iCord , int jCord, coordenadas *options){
     if(counter == 0){
         cout << "Esta pieza no se puede mover hacia ninguna casilla" << endl; /** Si el counter no aumento, quiere decir que no hay movimientos posibles**/
         system("pause");
-        teamCount--;
+        moverPieza(options);
         return;
     }
     cout << "Se puede mover a las siguientes opciones:" << endl;
@@ -578,25 +617,63 @@ void moverTorre(int iCord , int jCord, coordenadas *options){
         cout << (options[i].y)+1 << endl;
     }
 
+    for(int i = 0 ; i < counter ; i++){
+        eleccionesJaque[i].x = options[i].x;
+        eleccionesJaque[i].y = options[i].y;
+    }
+
+    igualarArrTemp();
+
     cout << "Escoge tu opcion ";
     check = 1; /** variable de control **/
     while(check == 1){ /** ciclo para asegurarnos de recibir datos validos **/
         try{
+
             check = 0;
             eleccion = cinOpcionValida(counter); /** nos aseguramos que el dato de entrada cumpla con varias caracterizticas, consultar la funcion para mayor detalle **/
+
+            if(eleccion == 0)
+                throw " ";
+
+            arr[eleccionesJaque[eleccion-1].x][eleccionesJaque[eleccion-1].y] = arr[iCord][jCord];
+            arr[iCord][jCord] = 0;
+
+            if(checkCheck(options))
+                throw 1;
+
         }catch(out_of_range){  /** si nos introducen un valor que no cabe en un int, out_of_range se arroja de manera implicita **/
             cout << "Favor de introducir un numero menor o igual a las opciones disponibles \n";
             check = 1;
         }catch(const char* ex){ /** Si sucede alguna excepcion la imprimimos **/
             cout << ex << endl;
+            if (ex != " ")
+                check = 1;
+        }catch(int x){
+            cout << "No Puedes hacer eso, estarias en jaque" << endl;
+            system("pause");
+            igualarArr();
+            board_set();
+            cout << "Se puede mover a las siguientes opciones:" << endl;
+            cout << "Seleccione 0 para cambiar de jugada" << endl;
+            cout << "Escriba \"patitogordito\" para rendirse" << endl;
+            for(int i = 0 ; i < counter ; i++){ /** for para imprimir las opciones que tiene el usuario **/
+                cout << "#" << i+1 << ":";
+                imprimirLetra(eleccionesJaque[i].x);
+                cout << (eleccionesJaque[i].y)+1 << endl;
+            }
             check = 1;
         }catch(...){
             cout << "Error desconocido";
+            delete [] elecciones;
+            delete [] eleccionesJaque;
             exit(1);
         }
     }
+
+    igualarArr();
+
     if(eleccion != 0){ /** si introducen 0 cancelan su jugada **/
-        arr[options[eleccion-1].x][options[eleccion-1].y] = arr[iCord][jCord];
+        arr[eleccionesJaque[eleccion-1].x][eleccionesJaque[eleccion-1].y] = arr[iCord][jCord];
         arr[iCord][jCord] = 0;
     }else{
         cout << "Has cancelado la jugada" << endl;
@@ -717,7 +794,7 @@ void moverCaballo(int iCord , int jCord, coordenadas *options){
     if(counter == 0){
         cout << "Esta pieza no se puede mover hacia ninguna casilla" << endl; /** Si el counter no aumento, quiere decir que no hay movimientos posibles**/
         system("pause");
-        teamCount--;
+        moverPieza(options);
         return;
     }
     cout << "Se puede mover a las siguientes opciones:" << endl;
@@ -728,25 +805,64 @@ void moverCaballo(int iCord , int jCord, coordenadas *options){
         cout << (options[i].y)+1 << endl;
     }
 
+    for(int i = 0 ; i < counter ; i++){
+        eleccionesJaque[i].x = options[i].x;
+        eleccionesJaque[i].y = options[i].y;
+    }
+
+
+    igualarArrTemp();
+
     cout << "Escoge tu opcion ";
     bool check = 1; /** variable de control **/
     while(check == 1){ /** ciclo para asegurarnos de recibir datos validos **/
         try{
+
             check = 0;
             eleccion = cinOpcionValida(counter); /** nos aseguramos que el dato de entrada cumpla con varias caracterizticas, consultar la funcion para mayor detalle **/
+
+            if(eleccion == 0)
+                throw " ";
+
+            arr[eleccionesJaque[eleccion-1].x][eleccionesJaque[eleccion-1].y] = arr[iCord][jCord];
+            arr[iCord][jCord] = 0;
+
+            if(checkCheck(options))
+                throw 1;
+
         }catch(out_of_range){  /** si nos introducen un valor que no cabe en un int, out_of_range se arroja de manera implicita **/
             cout << "Favor de introducir un numero menor o igual a las opciones disponibles \n";
             check = 1;
         }catch(const char* ex){ /** Si sucede alguna excepcion la imprimimos **/
             cout << ex << endl;
+            if (ex != " ")
+                check = 1;
+        }catch(int x){
+            cout << "No Puedes hacer eso, estarias en jaque" << endl;
+            system("pause");
+            igualarArr();
+            board_set();
+            cout << "Se puede mover a las siguientes opciones:" << endl;
+            cout << "Seleccione 0 para cambiar de jugada" << endl;
+            cout << "Escriba \"patitogordito\" para rendirse" << endl;
+            for(int i = 0 ; i < counter ; i++){ /** for para imprimir las opciones que tiene el usuario **/
+                cout << "#" << i+1 << ":";
+                imprimirLetra(eleccionesJaque[i].x);
+                cout << (eleccionesJaque[i].y)+1 << endl;
+            }
             check = 1;
         }catch(...){
             cout << "Error desconocido";
+            delete [] elecciones;
+            delete [] eleccionesJaque;
             exit(1);
         }
     }
+
+    igualarArr();
+
     if(eleccion != 0){ /** si introducen 0 cancelan su jugada **/
-        arr[options[eleccion-1].x][options[eleccion-1].y] = arr[iCord][jCord];
+        arr[eleccionesJaque[eleccion-1].x][eleccionesJaque[eleccion-1].y] = arr[iCord][jCord];
         arr[iCord][jCord] = 0;
     }else{
         cout << "Has cancelado la jugada" << endl;
@@ -755,8 +871,9 @@ void moverCaballo(int iCord , int jCord, coordenadas *options){
         board_set();
         moverPieza(options);
     }
-
 }
+
+
 
 /**
  *  Funcion: moverPeon
@@ -876,7 +993,7 @@ void moverPeon(int iCord , int jCord, coordenadas *options){
     if(counter == 0){
         cout << "Esta pieza no se puede mover hacia ninguna casilla" << endl; /** Si el counter no aumento, quiere decir que no hay movimientos posibles**/
         system("pause");
-        teamCount--;
+        moverPieza(options);
         return;
     }
     cout << "Se puede mover a las siguientes opciones:" << endl;
@@ -887,27 +1004,65 @@ void moverPeon(int iCord , int jCord, coordenadas *options){
         cout << (options[i].y)+1 << endl;
     }
 
+    for(int i = 0 ; i < counter ; i++){
+        eleccionesJaque[i].x = options[i].x;
+        eleccionesJaque[i].y = options[i].y;
+    }
+
+
+    igualarArrTemp();
+
     cout << "Escoge tu opcion ";
     bool check = 1; /** variable de control **/
     while(check == 1){ /** ciclo para asegurarnos de recibir datos validos **/
         try{
+
             check = 0;
             eleccion = cinOpcionValida(counter); /** nos aseguramos que el dato de entrada cumpla con varias caracterizticas, consultar la funcion para mayor detalle **/
+
+            if(eleccion == 0)
+                throw " ";
+
+            arr[eleccionesJaque[eleccion-1].x][eleccionesJaque[eleccion-1].y] = arr[iCord][jCord];
+            arr[iCord][jCord] = 0;
+
+            if(checkCheck(options))
+                throw 1;
+
         }catch(out_of_range){  /** si nos introducen un valor que no cabe en un int, out_of_range se arroja de manera implicita **/
             cout << "Favor de introducir un numero menor o igual a las opciones disponibles \n";
             check = 1;
         }catch(const char* ex){ /** Si sucede alguna excepcion la imprimimos **/
             cout << ex << endl;
+            if (ex != " ")
+                check = 1;
+        }catch(int x){
+            cout << "No Puedes hacer eso, estarias en jaque" << endl;
+            system("pause");
+            igualarArr();
+            board_set();
+            cout << "Se puede mover a las siguientes opciones:" << endl;
+            cout << "Seleccione 0 para cambiar de jugada" << endl;
+            cout << "Escriba \"patitogordito\" para rendirse" << endl;
+            for(int i = 0 ; i < counter ; i++){ /** for para imprimir las opciones que tiene el usuario **/
+                cout << "#" << i+1 << ":";
+                imprimirLetra(eleccionesJaque[i].x);
+                cout << (eleccionesJaque[i].y)+1 << endl;
+            }
             check = 1;
         }catch(...){
             cout << "Error desconocido";
+            delete [] elecciones;
+            delete [] eleccionesJaque;
             exit(1);
         }
     }
-    if(eleccion != 0){ /** si introducen 0 cancelan su jugada **/
-        arr[options[eleccion-1].x][options[eleccion-1].y] = arr[iCord][jCord];
-        arr[iCord][jCord] = 0;
 
+    igualarArr();
+
+    if(eleccion != 0){ /** si introducen 0 cancelan su jugada **/
+        arr[eleccionesJaque[eleccion-1].x][eleccionesJaque[eleccion-1].y] = arr[iCord][jCord];
+        arr[iCord][jCord] = 0;
     }else{
         cout << "Has cancelado la jugada" << endl;
         system("pause");
@@ -916,6 +1071,7 @@ void moverPeon(int iCord , int jCord, coordenadas *options){
         moverPieza(options);
     }
 }
+
 
 /**
  *  Funcion: moverAlfil
@@ -939,11 +1095,11 @@ void moverAlfil(int iCord , int jCord, coordenadas *options){
         jCordTemp--;
         if(iCordTemp < 0 || jCordTemp < 0){
             check = 0;
-        }else if(arr[iCordTemp][jCord]==0){
+        }else if(arr[iCordTemp][jCordTemp]==0){
             options[counter].x = iCordTemp;
             options[counter].y = jCordTemp;
             counter++;
-        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCord])){
+        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCordTemp])){
 		check = 0;
         }else{
             options[counter].x = iCordTemp;
@@ -962,11 +1118,11 @@ void moverAlfil(int iCord , int jCord, coordenadas *options){
         jCordTemp++;
         if(iCordTemp < 0 || jCordTemp > 7){
             check = 0;
-        }else if(arr[iCordTemp][jCord]==0){
+        }else if(arr[iCordTemp][jCordTemp]==0){
             options[counter].x = iCordTemp;
             options[counter].y = jCordTemp;
             counter++;
-        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCord])){
+        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCordTemp])){
             check = 0;
         }else{
             options[counter].x = iCordTemp;
@@ -985,11 +1141,11 @@ void moverAlfil(int iCord , int jCord, coordenadas *options){
         jCordTemp++;
         if(iCordTemp > 7 || jCordTemp > 7){
             check = 0;
-        }else if(arr[iCordTemp][jCord]==0){
+        }else if(arr[iCordTemp][jCordTemp]==0){
             options[counter].x = iCordTemp;
             options[counter].y = jCordTemp;
             counter++;
-        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCord])){
+        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCordTemp])){
             check = 0;
         }else{
             options[counter].x = iCordTemp;
@@ -1008,11 +1164,11 @@ void moverAlfil(int iCord , int jCord, coordenadas *options){
         jCordTemp--;
         if(iCordTemp > 7 || jCordTemp < 0){
             check = 0;
-        }else if(arr[iCordTemp][jCord]==0){
+        }else if(arr[iCordTemp][jCordTemp]==0){
             options[counter].x = iCordTemp;
             options[counter].y = jCordTemp;
             counter++;
-        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCord])){
+        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCordTemp])){
             check = 0;
         }else{
             options[counter].x = iCordTemp;
@@ -1030,7 +1186,7 @@ void moverAlfil(int iCord , int jCord, coordenadas *options){
     if(counter == 0){
         cout << "Esta pieza no se puede mover hacia ninguna casilla" << endl; /** Si el counter no aumento, quiere decir que no hay movimientos posibles**/
         system("pause");
-        teamCount--;
+        moverPieza(options);
         return;
     }
     cout << "Se puede mover a las siguientes opciones:" << endl;
@@ -1041,27 +1197,65 @@ void moverAlfil(int iCord , int jCord, coordenadas *options){
         cout << (options[i].y)+1 << endl;
     }
 
+    for(int i = 0 ; i < counter ; i++){
+        eleccionesJaque[i].x = options[i].x;
+        eleccionesJaque[i].y = options[i].y;
+    }
+
+
+    igualarArrTemp();
+
     cout << "Escoge tu opcion ";
     check = 1; /** variable de control **/
     while(check == 1){ /** ciclo para asegurarnos de recibir datos validos **/
         try{
+
             check = 0;
             eleccion = cinOpcionValida(counter); /** nos aseguramos que el dato de entrada cumpla con varias caracterizticas, consultar la funcion para mayor detalle **/
+
+            if(eleccion == 0)
+                throw " ";
+
+            arr[eleccionesJaque[eleccion-1].x][eleccionesJaque[eleccion-1].y] = arr[iCord][jCord];
+            arr[iCord][jCord] = 0;
+
+            if(checkCheck(options))
+                throw 1;
+
         }catch(out_of_range){  /** si nos introducen un valor que no cabe en un int, out_of_range se arroja de manera implicita **/
             cout << "Favor de introducir un numero menor o igual a las opciones disponibles \n";
             check = 1;
         }catch(const char* ex){ /** Si sucede alguna excepcion la imprimimos **/
             cout << ex << endl;
+            if (ex != " ")
+                check = 1;
+        }catch(int x){
+            cout << "No Puedes hacer eso, estarias en jaque" << endl;
+            system("pause");
+            igualarArr();
+            board_set();
+            cout << "Se puede mover a las siguientes opciones:" << endl;
+            cout << "Seleccione 0 para cambiar de jugada" << endl;
+            cout << "Escriba \"patitogordito\" para rendirse" << endl;
+            for(int i = 0 ; i < counter ; i++){ /** for para imprimir las opciones que tiene el usuario **/
+                cout << "#" << i+1 << ":";
+                imprimirLetra(eleccionesJaque[i].x);
+                cout << (eleccionesJaque[i].y)+1 << endl;
+            }
             check = 1;
         }catch(...){
             cout << "Error desconocido";
+            delete [] elecciones;
+            delete [] eleccionesJaque;
             exit(1);
         }
     }
-    if(eleccion != 0){ /** si introducen 0 cancelan su jugada **/
-        arr[options[eleccion-1].x][options[eleccion-1].y] = arr[iCord][jCord];
-        arr[iCord][jCord] = 0;
 
+    igualarArr();
+
+    if(eleccion != 0){ /** si introducen 0 cancelan su jugada **/
+        arr[eleccionesJaque[eleccion-1].x][eleccionesJaque[eleccion-1].y] = arr[iCord][jCord];
+        arr[iCord][jCord] = 0;
     }else{
         cout << "Has cancelado la jugada" << endl;
         system("pause");
@@ -1069,8 +1263,8 @@ void moverAlfil(int iCord , int jCord, coordenadas *options){
         board_set();
         moverPieza(options);
     }
-
 }
+
 
 /**
  *  Funcion: moverReina
@@ -1116,11 +1310,11 @@ void moverReina(int iCord , int jCord, coordenadas *options){
         jCordTemp++;
         if(iCordTemp < 0 || jCordTemp > 7){
             check = 0;
-        }else if(arr[iCordTemp][jCord]==0){
+        }else if(arr[iCordTemp][jCordTemp]==0){
             options[counter].x = iCordTemp;
             options[counter].y = jCordTemp;
             counter++;
-        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCord])){
+        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCordTemp])){
             check = 0;
         }else{
             options[counter].x = iCordTemp;
@@ -1161,11 +1355,11 @@ void moverReina(int iCord , int jCord, coordenadas *options){
         jCordTemp++;
         if(iCordTemp > 7 || jCordTemp > 7){
             check = 0;
-        }else if(arr[iCordTemp][jCord]==0){
+        }else if(arr[iCordTemp][jCordTemp]==0){
             options[counter].x = iCordTemp;
             options[counter].y = jCordTemp;
             counter++;
-        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCord])){
+        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCordTemp])){
             check = 0;
         }else{
             options[counter].x = iCordTemp;
@@ -1205,11 +1399,11 @@ void moverReina(int iCord , int jCord, coordenadas *options){
         jCordTemp--;
         if(iCordTemp > 7 || jCordTemp < 0){
             check = 0;
-        }else if(arr[iCordTemp][jCord]==0){
+        }else if(arr[iCordTemp][jCordTemp]==0){
             options[counter].x = iCordTemp;
             options[counter].y = jCordTemp;
             counter++;
-        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCord])){
+        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCordTemp])){
             check = 0;
         }else{
             options[counter].x = iCordTemp;
@@ -1250,11 +1444,11 @@ void moverReina(int iCord , int jCord, coordenadas *options){
         jCordTemp--;
         if(iCordTemp < 0 || jCordTemp < 0){
             check = 0;
-        }else if(arr[iCordTemp][jCord]==0){
+        }else if(arr[iCordTemp][jCordTemp]==0){
             options[counter].x = iCordTemp;
             options[counter].y = jCordTemp;
             counter++;
-        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCord])){
+        }else if(mismoEquipo(arr[iCord][jCord],arr[iCordTemp][jCordTemp])){
             check = 0;
         }else{
             options[counter].x = iCordTemp;
@@ -1269,10 +1463,15 @@ void moverReina(int iCord , int jCord, coordenadas *options){
         return;
     }
 
+    for(int i = 0 ; i < counter ; i++){
+        eleccionesJaque[i].x = options[i].x;
+        eleccionesJaque[i].y = options[i].y;
+    }
+
     if(counter == 0){
         cout << "Esta pieza no se puede mover hacia ninguna casilla" << endl; /** Si el counter no aumento, quiere decir que no hay movimientos posibles**/
         system("pause");
-        teamCount--;
+        moverPieza(options);
         return;
     }
     cout << "Se puede mover a las siguientes opciones:" << endl;
@@ -1283,27 +1482,61 @@ void moverReina(int iCord , int jCord, coordenadas *options){
         cout << (options[i].y)+1 << endl;
     }
 
+
+
+    igualarArrTemp();
+
     cout << "Escoge tu opcion ";
     check = 1; /** variable de control **/
     while(check == 1){ /** ciclo para asegurarnos de recibir datos validos **/
         try{
+
             check = 0;
             eleccion = cinOpcionValida(counter); /** nos aseguramos que el dato de entrada cumpla con varias caracterizticas, consultar la funcion para mayor detalle **/
+
+            if(eleccion == 0)
+                throw " ";
+
+            arr[eleccionesJaque[eleccion-1].x][eleccionesJaque[eleccion-1].y] = arr[iCord][jCord];
+            arr[iCord][jCord] = 0;
+
+            if(checkCheck(options))
+                throw 1;
+
         }catch(out_of_range){  /** si nos introducen un valor que no cabe en un int, out_of_range se arroja de manera implicita **/
             cout << "Favor de introducir un numero menor o igual a las opciones disponibles \n";
             check = 1;
         }catch(const char* ex){ /** Si sucede alguna excepcion la imprimimos **/
             cout << ex << endl;
+            if (ex != " ")
+                check = 1;
+        }catch(int x){
+            cout << "No Puedes hacer eso, estarias en jaque" << endl;
+            system("pause");
+            igualarArr();
+            board_set();
+            cout << "Se puede mover a las siguientes opciones:" << endl;
+            cout << "Seleccione 0 para cambiar de jugada" << endl;
+            cout << "Escriba \"patitogordito\" para rendirse" << endl;
+            for(int i = 0 ; i < counter ; i++){ /** for para imprimir las opciones que tiene el usuario **/
+                cout << "#" << i+1 << ":";
+                imprimirLetra(eleccionesJaque[i].x);
+                cout << (eleccionesJaque[i].y)+1 << endl;
+            }
             check = 1;
         }catch(...){
             cout << "Error desconocido";
+            delete [] elecciones;
+            delete [] eleccionesJaque;
             exit(1);
         }
     }
-    if(eleccion != 0){ /** si introducen 0 cancelan su jugada **/
-        arr[options[eleccion-1].x][options[eleccion-1].y] = arr[iCord][jCord];
-        arr[iCord][jCord] = 0;
 
+    igualarArr();
+
+    if(eleccion != 0){ /** si introducen 0 cancelan su jugada **/
+        arr[eleccionesJaque[eleccion-1].x][eleccionesJaque[eleccion-1].y] = arr[iCord][jCord];
+        arr[iCord][jCord] = 0;
     }else{
         cout << "Has cancelado la jugada" << endl;
         system("pause");
@@ -1312,6 +1545,7 @@ void moverReina(int iCord , int jCord, coordenadas *options){
         moverPieza(options);
     }
 }
+
 
 /**
  *  Funcion: moverRey
@@ -1410,7 +1644,7 @@ void moverRey(int iCord , int jCord, coordenadas *options){
     if(counter == 0){
         cout << "Esta pieza no se puede mover hacia ninguna casilla" << endl; /** Si el counter no aumento, quiere decir que no hay movimientos posibles**/
         system("pause");
-        teamCount--;
+        moverPieza(options);
         return;
     }
     cout << "Se puede mover a las siguientes opciones:" << endl;
@@ -1421,27 +1655,65 @@ void moverRey(int iCord , int jCord, coordenadas *options){
         cout << (options[i].y)+1 << endl;
     }
 
+    for(int i = 0 ; i < counter ; i++){
+        eleccionesJaque[i].x = options[i].x;
+        eleccionesJaque[i].y = options[i].y;
+    }
+
+
+    igualarArrTemp();
+
     cout << "Escoge tu opcion ";
     check = 1; /** variable de control **/
     while(check == 1){ /** ciclo para asegurarnos de recibir datos validos **/
         try{
+
             check = 0;
             eleccion = cinOpcionValida(counter); /** nos aseguramos que el dato de entrada cumpla con varias caracterizticas, consultar la funcion para mayor detalle **/
+
+            if(eleccion == 0)
+                throw " ";
+
+            arr[eleccionesJaque[eleccion-1].x][eleccionesJaque[eleccion-1].y] = arr[iCord][jCord];
+            arr[iCord][jCord] = 0;
+
+            if(checkCheck(options))
+                throw 1;
+
         }catch(out_of_range){  /** si nos introducen un valor que no cabe en un int, out_of_range se arroja de manera implicita **/
             cout << "Favor de introducir un numero menor o igual a las opciones disponibles \n";
             check = 1;
         }catch(const char* ex){ /** Si sucede alguna excepcion la imprimimos **/
             cout << ex << endl;
+            if (ex != " ")
+                check = 1;
+        }catch(int x){
+            cout << "No Puedes hacer eso, estarias en jaque" << endl;
+            system("pause");
+            igualarArr();
+            board_set();
+            cout << "Se puede mover a las siguientes opciones:" << endl;
+            cout << "Seleccione 0 para cambiar de jugada" << endl;
+            cout << "Escriba \"patitogordito\" para rendirse" << endl;
+            for(int i = 0 ; i < counter ; i++){ /** for para imprimir las opciones que tiene el usuario **/
+                cout << "#" << i+1 << ":";
+                imprimirLetra(eleccionesJaque[i].x);
+                cout << (eleccionesJaque[i].y)+1 << endl;
+            }
             check = 1;
         }catch(...){
             cout << "Error desconocido";
+            delete [] elecciones;
+            delete [] eleccionesJaque;
             exit(1);
         }
     }
-    if(eleccion != 0){ /** si introducen 0 cancelan su jugada **/
-        arr[options[eleccion-1].x][options[eleccion-1].y] = arr[iCord][jCord];
-        arr[iCord][jCord] = 0;
 
+    igualarArr();
+
+    if(eleccion != 0){ /** si introducen 0 cancelan su jugada **/
+        arr[eleccionesJaque[eleccion-1].x][eleccionesJaque[eleccion-1].y] = arr[iCord][jCord];
+        arr[iCord][jCord] = 0;
     }else{
         cout << "Has cancelado la jugada" << endl;
         system("pause");
@@ -1449,8 +1721,6 @@ void moverRey(int iCord , int jCord, coordenadas *options){
         board_set();
         moverPieza(options);
     }
-
-
 }
 
 /**
@@ -1464,6 +1734,20 @@ void moverRey(int iCord , int jCord, coordenadas *options){
 int cinOpcionValida(int top){
     string dummy;
     cin >> dummy;
+    if(dummy == "patitogordito"){
+        if(teamCount%2 != 0){
+            cout << "Han ganado las piezas negras, bien jugado! :D" << endl;
+            delete [] elecciones;
+            delete [] eleccionesJaque;
+            exit(1);
+        }else{
+            cout << "Han ganado las piezas blancas, bien jugado! :D" << endl;
+            delete [] elecciones;
+            delete [] eleccionesJaque;
+            exit(1);
+        }
+    }
+
     if(!isValidInt(dummy))
         throw "Favor de solo introducir numeros positivos ";
 
@@ -1478,7 +1762,15 @@ int cinOpcionValida(int top){
     return eleccion;
 }
 
-void checkCheck(coordenadas* options){
+/**
+ *  Funcion: checkCheck.
+ *
+ *  @Descripcion: Funcion que busca en todo el tablero, casilla por casilla, el rey del jugador en turno, y piezas que le puedan hacer jaque al rey en cuestion.
+ *  @Parametros: Un arreglo de coordenadas.
+ *  @Retorna: Falso si el jugador en turno no se encuentra en jaque, verdadero si si se encuentra en jaque.
+**/
+
+bool checkCheck(coordenadas* options){
     callCheck = 1;
     coordenadas rey;
 
@@ -1498,27 +1790,26 @@ void checkCheck(coordenadas* options){
         }
     }
 
-    cout << rey.x << " " << rey.y << endl;
-
     for(int i = 0 ; i < 8 ; i++){
         for(int j = 0 ; j < 8 ; j++){
             if(piezaJaque(options , i , j , rey.x , rey.y)){
-                if(arr[rey.x][rey.y] > 0){
-                    cout << "Estan en jaque las blancas" << endl;
-                }else{
-                    cout << "Estan en jaque las negras" << endl;
-                }
+                    callCheck = 0;
+                    return true;
+
             }
         }
     }
-
-
-    system("pause");
-    system("cls");
-
-
     callCheck = 0;
+    return false;
 }
+
+/**
+ *  Funcion: piezaJaque
+ *
+ *  @Descripcion: Se encarga de buscar piezas que hagan jaque al rey del jugador en turno.
+ *  @Parametros: Un arreglo de coordenadas, un par de enteros que representan la coordenada de una pieza, y las coordenadas del rey del jugador en turno.
+ *  @Retorna: Falso si es una pieza que no esta haciendo jaque, verdadero si es una pieza que esta haciendo jaque.
+**/
 
 bool piezaJaque(coordenadas* options,int iCord, int jCord, int reyX, int reyY){
 
@@ -1659,4 +1950,88 @@ bool piezaJaque(coordenadas* options,int iCord, int jCord, int reyX, int reyY){
     return false;
 }
 
+/**
+ *  Funcion: igualarArr
+ *
+ *  @Descripcion: Contamos con un arreglo bidimensional temporal, en donde guardamos un estado del tablero. Esto nos sirve para ir checando que movimientos puede hacer el jugador
+ *  sin dejarlo en jaque.
+ *  @Parametros: Nada.
+ *  @Retorna: Nada.
+**/
+
+void igualarArrTemp(){
+    for(int i = 0 ; i < 8 ; i++){
+        for(int j = 0 ; j < 8 ; j++){
+            arrTemp[i][j] = arr[i][j];
+        }
+    }
+}
+
+/**
+ *  Funcion: igualarArr
+ *
+ *  @Descripcion: Contamos con un arreglo bidimensional temporal, para saber si el jugador puede moverse cuando esta en jaque o no, esta funcion iguala el arreglo original, al estado que
+ *  guardamos en el temporal.
+ *  @Parametros: Nada.
+ *  @Retorna: Nada.
+**/
+
+void igualarArr(){
+    for(int i = 0 ; i < 8 ; i++){
+        for(int j = 0 ; j < 8 ; j++){
+            arr[i][j] = arrTemp[i][j];
+        }
+    }
+}
+
+/**
+ *  Funcion: relojNegras
+ *
+ *  @Descripcion: Mediante la libreria ctime, calculamos cuanto tiempo le toma al jugador de las piezas negras hacer su movimiento.
+ *  @Parametros: Nada.
+ *  @Retorna: Nada.
+**/
+
+void relojNegras(){
+    tiempoNegras = tiempoNegras + ((clock() - startNegras) / (double) CLOCKS_PER_SEC);
+    startBlancas = clock();
+    return;
+}
+
+/**
+ *  Funcion: relojBlancas
+ *
+ *  @Descripcion: Mediante la libreria ctime, calculamos cuanto tiempo le toma al jugador de las piezas blancas hacer su movimiento.
+ *  @Parametros: Nada.
+ *  @Retorna: Nada.
+**/
+
+void relojBlancas(){
+    tiempoBlancas = tiempoBlancas + ((clock() - startBlancas) / (double) CLOCKS_PER_SEC);
+    startNegras = clock();
+    return;
+}
+
+/**
+ *  Funcion: timesUp
+ *
+ *  @Descripcion: Se asegura que el tiempo de los jugadores no exeda una cantidad establecida, en este caso 180. (Esta funcion se utiliza con un hilo y un ciclo infinito).
+ *  @Parametros: Nada.
+ *  @Retorna: Nada.
+**/
+
+void timesUp(){
+    while(1){
+        if(tiempoBlancas > 180){
+            std::this_thread::sleep_for (std::chrono::milliseconds(25));
+            cout << "Se le acabo el tiempo a las piezas blancas, ganaron las piezas negras." << endl;
+            exit(1);
+        }
+        if(tiempoNegras > 180){
+            std::this_thread::sleep_for (std::chrono::milliseconds(25));
+            cout << "Se le acabo el tiempo a las piezas negras, ganaron las piezas blancas." << endl;
+            exit(1);
+        }
+    }
+}
 
