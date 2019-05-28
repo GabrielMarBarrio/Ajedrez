@@ -230,6 +230,14 @@ void board_set(){
     }
 }
 
+/**
+ *  Funcion: Mover Pieza
+ *
+ *  @Descripcion: Función que pide las coordenadas de la pieza a mover y dependiendo de la pieza a mover se llama su funcion correspondiente.
+ *  @Parametros: El arreglo de posibles elecciones creado en main.
+ *  @Retorna: Ninguno.
+**/
+
 void moverPieza(coordenadas *options){
     string tempX;
     int coorX=0, coorY=0;
