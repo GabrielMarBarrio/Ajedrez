@@ -83,10 +83,11 @@ void igualarArr();
 void timesUp();
 void relojNegras();
 void relojBlancas();
+void mensajeBienvenida();
 
 int main()
 {
-    system("pause");
+    mensajeBienvenida();
     try{
     elecciones = new coordenadas[64];
     eleccionesJaque = new coordenadas[64];
@@ -237,7 +238,7 @@ void board_set(){
 /**
  *  Funcion: Mover Pieza
  *
- *  @Descripcion: Función que pide las coordenadas de la pieza a mover y dependiendo de la pieza a mover se llama su funcion correspondiente.
+ *  @Descripcion: FunciÃ³n que pide las coordenadas de la pieza a mover y dependiendo de la pieza a mover se llama su funcion correspondiente.
  *  @Parametros: El arreglo de posibles elecciones creado en main.
  *  @Retorna: Ninguno.
 **/
@@ -2049,4 +2050,312 @@ void timesUp(){
             exit(1);
         }
     }
+}
+
+
+void mensajeBienvenida(){
+
+
+    //Dos lineas con "#"
+    system("color 03");
+    for(int i=0;i<2;i++){
+        for(int j=0;j<68;j++){
+            cout << "#";
+            std::this_thread::sleep_for (std::chrono::milliseconds(5));
+        }cout << endl;
+    }
+    //Cuarta linea
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<5;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+
+    for(int i=0;i<5;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||||||||";
+    for(int i=0;i<5;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<12;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"|||||||";
+    for(int i=0;i<8;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout << endl;
+    //Quinta linea
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<5;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"|||";
+    for(int i=0;i<6;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"|||";
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<10;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }cout<<"||||";
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }cout<<"||||";
+    for(int i=0;i<5;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+
+    cout << endl;
+    //Sexta linea
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<5;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<3;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"|||";
+    for(int i=0;i<8;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"|||";
+    for(int i=0;i<3;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<9;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }cout<<"||||";
+    for(int i=0;i<6;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }cout<<"||||";
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout <<endl;
+    //Septima linea
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"|||||||||||||";
+    for(int i=0;i<3;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"|||";
+    for(int i=0;i<8;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"|||";
+    for(int i=0;i<3;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<9;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }cout<<"||||";
+    for(int i=0;i<6;i++){
+        cout << "|";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }cout<<"||||";
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout <<endl;
+
+    //Octava linea
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<5;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<3;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"|||";
+    for(int i=0;i<8;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"|||";
+    for(int i=0;i<3;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<9;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }cout<<"||||";
+    for(int i=0;i<6;i++){
+        cout << "|";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }cout<<"||||";
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout <<endl;
+    //Novena linea
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<5;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"|||";
+    for(int i=0;i<6;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"|||";
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<9;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }cout<<"||||";
+    for(int i=0;i<6;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }cout<<"||||";
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout <<endl;
+    //decima linea
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<5;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+
+    for(int i=0;i<5;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||||||||";
+    for(int i=0;i<5;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||||||||";
+    for(int i=0;i<3;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout<<"||||";
+    for(int i=0;i<6;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }cout<<"||||";
+    for(int i=0;i<4;i++){
+        cout << "#";
+        std::this_thread::sleep_for (std::chrono::milliseconds(10));
+    }
+    cout <<endl;
+    //Dos lineas con "#"
+        for(int j=0;j<68;j++){
+            cout << "=";
+            std::this_thread::sleep_for (std::chrono::milliseconds(5));
+        }cout << endl;
+    for(int j=0;j<29;j++){
+            cout << "#";
+            std::this_thread::sleep_for (std::chrono::milliseconds(5));
+        }
+        cout <<"CREDITOS:";
+        for(int j=0;j<30;j++){
+            cout << "#";
+            std::this_thread::sleep_for (std::chrono::milliseconds(5));
+        }
+        cout << endl;
+
+    cout << "###########DANIEL HERMOSILLO############DANIEL VILLAREAL############"<<endl;
+        for(int j=0;j<68;j++){
+            cout << "#";
+            std::this_thread::sleep_for (std::chrono::milliseconds(5));
+        }cout << endl;
+    cout << "#########GABRIEL MAR########JULIAN TERAN########LUIS FELIX##########"<<endl;
+    for(int i=0;i<2;i++){
+        for(int j=0;j<68;j++){
+            cout << "#";
+            std::this_thread::sleep_for (std::chrono::milliseconds(5));
+        }cout << endl;
+    }
+    system("pause");
+    system("cls");
+    system("color 03");
+    cout << "BIENVENIDO AL JUEGO DE AJEDREZ PARA DOS PERSONAS, BUENA SUERTE! [...]"<< endl;
+    std::this_thread::sleep_for (std::chrono::seconds(3));
+    system("cls");
 }
