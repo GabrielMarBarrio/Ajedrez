@@ -2488,7 +2488,8 @@ void mensajeBienvenida(){
     system("pause");
     system("cls");
     system("color 03");
-    cout << "BIENVENIDO AL JUEGO DE AJEDREZ PARA DOS PERSONAS, BUENA SUERTE! [...]"<< endl;
-    std::this_thread::sleep_for (std::chrono::seconds(3));
+    cout << "BIENVENIDO AL JUEGO DE AJEDREZ PARA DOS PERSONAS, BUENA SUERTE!"<< endl;
+    cout << "Fun fact: Te puedes rendir si escribes \"patitogordito\" en cualquier momento. [...]"<< endl;
+    system("pause");
     system("cls");
 }
