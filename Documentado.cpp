@@ -2489,7 +2489,8 @@ void mensajeBienvenida(){
     system("cls");
     system("color 03");
     cout << "BIENVENIDO AL JUEGO DE AJEDREZ PARA DOS PERSONAS, BUENA SUERTE!"<< endl;
-    cout << "Fun fact: Te puedes rendir si escribes \"patitogordito\" en cualquier momento. [...]"<< endl;
+    cout << "Fun fact: Te puedes rendir si escribes \"patitogordito\" en cualquier momento."<< endl;
+    cout << "Elija que jugador sera las piezas blancas, ya que al continuar el juego comenzara, y consigo el turno de las piezas blanacas."<< endl;
     system("pause");
     system("cls");
 }
