@@ -40,6 +40,7 @@ struct coordenadas{
 };
 int arr[8][8] = {};
 int arrTemp[8][8] = {};
+int colors[8][8] = {};
 bool jaqueMate=false;
 int teamCount = 1;
 coordenadas *elecciones;
@@ -68,7 +69,8 @@ void imprimirLetra(int cordLetra);
 int cinOpcionValida(int top);
 bool mismoEquipo(int piezaAMover, int piezaTope);
 void inicializarTablero();
-void board_set();
+void board_set(coordenadas *options = nullptr, int counter = 0);
+void board_print();
 void moverPieza(coordenadas *options);
 void moverPeon(int iCord , int jCord, coordenadas *options);
 void moverTorre(int iCord , int jCord, coordenadas *options);
@@ -93,6 +95,9 @@ int main()
     eleccionesJaque = new coordenadas[64];
     }catch(...){
         cout << "Error fatal, el programa terminara";
+        delete [] elecciones;
+        delete [] eleccionesJaque;
+        exit(1);
     }
     thread timer(timesUp);
     inicializarTablero();
@@ -110,8 +115,10 @@ int main()
         }
     }
     board_set();
+    board_print();
     moverPieza(elecciones);
     board_set();
+    board_print();
     teamCount++;
     if(teamCount % 2 != 0){
         relojNegras();
@@ -138,87 +145,139 @@ int main()
  *  @Retorna: Ninguno.
 **/
 
-void board_set(){
-	system("CLS");
-	bool check = true;
-	std::cout << "   ";
-	std::cout << " 1  2  3  4  5  6  7  8\n";
-	for(int i=0; i<8; i++){
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
-		switch(i){
-			default:
-				break;
-			case 0:
-				std::cout << " a ";
-				break;
-			case 1:
-				std::cout << " b ";
-				break;
-			case 2:
-				std::cout << " c ";
-				break;
-			case 3:
-				std::cout << " d ";
-				break;
-			case 4:
-				std::cout << " e ";
-				break;
-			case 5:
-				std::cout << " f ";
-				break;
-			case 6:
-				std::cout << " g ";
-				break;
-			case 7:
-				std::cout << " h ";
-				break;
-		}
-		for(int j=0; j<8; j++){
-			if(check){
-				if(arr[i][j] < 0)
-					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 112);
-				else
-					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 127);
-			}
-			else{
-				if(arr[i][j] < 0)
-					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 128);
-				else
-					SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 143);
-			}
-			check = !check;
-			std::cout << std::setw(2);
-			if(arr[i][j] == 0)
-				std::cout << "   ";
-			else
-				switch(abs(arr[i][j])){
-					default:
-						break;
-					case 1:
-						std::cout << " P ";
-						break;
-					case 2:
-						std::cout << " R ";
-						break;
-					case 3:
-						std::cout << " N ";
-						break;
-					case 4:
-						std::cout << " B ";
-						break;
-					case 5:
-						std::cout << " Q ";
-						break;
-					case 6:
-						std::cout << " K ";
-						break;
-				}
-		}
-		check = !check;
-		std::cout << std::endl;
-	}
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
-	if(teamCount % 2 != 0){
+void board_set(coordenadas *options, int counter){
+    for(int i=0; i<8; i++){
+        for(int j=0; j<8; j++){
+            colors[i][j] = 0;
+        }
+    }
+    for(int i=0; i<counter; i++){
+        colors[options[i].x][options[i].y] = 1;
+    }
+}
+
+/**
+ *  Funcion: board_print
+ *
+ *  @Descripcion: Funcion que imprime el estado acutal del juego y colorea las casillas a las que se puede mover una pieza en especifico.
+ *  @Parametros: Nada.
+ *  @Retorna: Nada.
+**/
+
+void board_print(){
+    bool check = true;
+    system("cls");
+    std::cout << "   ";
+    std::cout << " 1  2  3  4  5  6  7  8\n";
+    for(int i=0; i<8; i++){
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+        switch(i){
+            default:
+                break;
+            case 0:
+                std::cout << " a ";
+                break;
+            case 1:
+                std::cout << " b ";
+                break;
+            case 2:
+                std::cout << " c ";
+                break;
+            case 3:
+                std::cout << " d ";
+                break;
+            case 4:
+                std::cout << " e ";
+                break;
+            case 5:
+                std::cout << " f ";
+                break;
+            case 6:
+                std::cout << " g ";
+                break;
+            case 7:
+                std::cout << " h ";
+                break;
+        }
+        for(int j=0; j<8; j++){
+            switch(colors[i][j]){
+                default:
+                    break;
+                case 0:
+                    if(check){
+                        if(arr[i][j] < 0)
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 112);
+                        else
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 127);
+                    }
+                    else{
+                        if(arr[i][j] < 0)
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 128);
+                        else
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 143);
+                    }
+                    break;
+                case 1:
+                    if(check){
+                        if(arr[i][j] < 0)
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 160);
+                        else
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 175);
+                    }
+                    else{
+                        if(arr[i][j] < 0)
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 32);
+                        else
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 47);
+                    }
+                    break;
+                case 2:
+                    if(check){
+                        if(arr[i][j] < 0)
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 192);
+                        else
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 207);
+                    }
+                    else{
+                        if(arr[i][j] < 0)
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 64);
+                        else
+                            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 79);
+                    }
+                    break;
+            }
+            if(arr[i][j] == 0)
+                std::cout << "   ";
+            else
+                switch(abs(arr[i][j])){
+                    default:
+                        break;
+                    case 1:
+                        std::cout << " P ";
+                        break;
+                    case 2:
+                        std::cout << " R ";
+                        break;
+                    case 3:
+                        std::cout << " N ";
+                        break;
+                    case 4:
+                        std::cout << " B ";
+                        break;
+                    case 5:
+                        std::cout << " Q ";
+                        break;
+                    case 6:
+                        std::cout << " K ";
+                        break;
+            }
+            check = !check;
+        }
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+        std::cout << std::endl;
+        check = !check;
+    }
+    if(teamCount % 2 != 0){
         tiempoBlancas = tiempoBlancas + ((clock() - startBlancas) / (double) CLOCKS_PER_SEC);
         startBlancas = clock();
         if(tiempoBlancas < 180 && tiempoNegras < 180){
@@ -248,6 +307,7 @@ void moverPieza(coordenadas *options){
     int coorX=0, coorY=0;
     bool ban=false;
     board_set();
+    board_print();
     //Pide las coordenadas de la pieza a mover y verifica que sea coordenadas validas.
     do{
         try{
@@ -276,12 +336,14 @@ void moverPieza(coordenadas *options){
             system("pause");
             system("cls");
             board_set();
+            board_print();
         }catch(out_of_range){  /** si nos introducen un valor que no cabe en un int, out_of_range se arroja de manera implicita **/
            system("cls");
             cout << "NO EXISTE ESA COLUMNA (1-8)\n" << endl << endl;
             system("pause");
             system("cls");
             board_set();
+            board_print();
         }
 
     }while(!ban);
@@ -317,36 +379,48 @@ void moverPieza(coordenadas *options){
             case 1:
                 system("cls");
                 board_set();
+                colors[coorX][coorY] = 2;
+                board_print();
                 cout << "SELECCIONASTE EL PEON (" << tempX << "," << coorY+1 << ")" << endl << endl;
                 moverPeon(coorX, coorY, options);
             break;
             case 2:
                 system("cls");
                 board_set();
+                colors[coorX][coorY] = 2;
+                board_print();
                 cout << "SELECCIONASTE LA TORRE (" << tempX << "," << coorY+1 << ")" << endl << endl;
                 moverTorre(coorX, coorY,options);
             break;
             case 3:
                 system("cls");
                 board_set();
+                colors[coorX][coorY] = 2;
+                board_print();
                 cout << "SELECCIONASTE EL CABALLO (" << tempX << "," << coorY+1 << ")" << endl << endl;
                 moverCaballo(coorX, coorY, options);
             break;
             case 4:
                 system("cls");
                 board_set();
+                colors[coorX][coorY] = 2;
+                board_print();
                 cout << "SELECCIONASTE EL ALFIL (" << tempX << "," << coorY+1 << ")" << endl << endl;
                 moverAlfil(coorX, coorY, options);
             break;
             case 5:
                 system("cls");
                 board_set();
+                colors[coorX][coorY] = 2;
+                board_print();
                 cout << "SELECCIONASTE LA REINA (" << tempX << "," << coorY+1 << ")" << endl << endl;
                 moverReina(coorX, coorY, options);
             break;
             case 6:
                 system("cls");
                 board_set();
+                colors[coorX][coorY] = 2;
+                board_print();
                 cout << "SELECCIONASTE EL REY (" << tempX << "," << coorY+1 << ")" << endl << endl;
                 moverRey(coorX, coorY, options);
             break;
@@ -360,36 +434,48 @@ void moverPieza(coordenadas *options){
             case -1:
                 system("cls");
                 board_set();
+                colors[coorX][coorY] = 2;
+                board_print();
                 cout << "SELECCIONASTE EL PEON (" << tempX << "," << coorY+1 << ")" << endl << endl;
                 moverPeon(coorX, coorY, options);
             break;
             case -2:
                 system("cls");
                 board_set();
+                colors[coorX][coorY] = 2;
+                board_print();
                 cout << "SELECCIONASTE LA TORRE (" << tempX << "," << coorY+1 << ")" << endl << endl;
                 moverTorre(coorX, coorY,options);
             break;
             case -3:
                 system("cls");
                 board_set();
+                colors[coorX][coorY] = 2;
+                board_print();
                 cout << "SELECCIONASTE EL CABALLO (" << tempX << "," << coorY+1 << ")" << endl << endl;
                 moverCaballo(coorX, coorY, options);
             break;
             case -4:
                 system("cls");
                 board_set();
+                colors[coorX][coorY] = 2;
+                board_print();
                 cout << "SELECCIONASTE EL ALFIL (" << tempX << "," << coorY+1 << ")" << endl << endl;
                 moverAlfil(coorX, coorY, options);
             break;
             case -5:
                 system("cls");
                 board_set();
+                colors[coorX][coorY] = 2;
+                board_print();
                 cout << "SELECCIONASTE LA REINA (" << tempX << "," << coorY+1 << ")" << endl << endl;
                 moverReina(coorX, coorY, options);
             break;
             case -6:
                 system("cls");
                 board_set();
+                colors[coorX][coorY] = 2;
+                board_print();
                 cout << "SELECCIONASTE EL REY (" << tempX << "," << coorY+1 << ")" << endl << endl;
                 moverRey(coorX, coorY, options);
             break;
@@ -622,6 +708,11 @@ void moverTorre(int iCord , int jCord, coordenadas *options){
         moverPieza(options);
         return;
     }
+
+    board_set(options, counter);
+    colors[iCord][jCord] = 2;
+    board_print();
+
     cout << "Se puede mover a las siguientes opciones:" << endl;
     cout << "Seleccione 0 para cambiar de jugada" << endl;
     for(int i = 0 ; i < counter ; i++){ /** for para imprimir las opciones que tiene el usuario **/
@@ -666,6 +757,7 @@ void moverTorre(int iCord , int jCord, coordenadas *options){
             system("pause");
             igualarArr();
             board_set();
+            board_print();
             cout << "Se puede mover a las siguientes opciones:" << endl;
             cout << "Seleccione 0 para cambiar de jugada" << endl;
             cout << "Escriba \"patitogordito\" para rendirse" << endl;
@@ -693,6 +785,7 @@ void moverTorre(int iCord , int jCord, coordenadas *options){
         system("pause");
         system("cls");
         board_set();
+        board_print();
         moverPieza(options);
     }
 }
@@ -810,6 +903,11 @@ void moverCaballo(int iCord , int jCord, coordenadas *options){
         moverPieza(options);
         return;
     }
+
+    board_set(options, counter);
+    colors[iCord][jCord] = 2;
+    board_print();
+
     cout << "Se puede mover a las siguientes opciones:" << endl;
     cout << "Seleccione 0 para cambiar de jugada" << endl;
     for(int i = 0 ; i < counter ; i++){ /** for para imprimir las opciones que tiene el usuario **/
@@ -855,6 +953,7 @@ void moverCaballo(int iCord , int jCord, coordenadas *options){
             system("pause");
             igualarArr();
             board_set();
+            board_print();
             cout << "Se puede mover a las siguientes opciones:" << endl;
             cout << "Seleccione 0 para cambiar de jugada" << endl;
             cout << "Escriba \"patitogordito\" para rendirse" << endl;
@@ -882,6 +981,7 @@ void moverCaballo(int iCord , int jCord, coordenadas *options){
         system("pause");
         system("cls");
         board_set();
+        board_print();
         moverPieza(options);
     }
 }
@@ -1009,6 +1109,11 @@ void moverPeon(int iCord , int jCord, coordenadas *options){
         moverPieza(options);
         return;
     }
+
+    board_set(options, counter);
+    colors[iCord][jCord] = 2;
+    board_print();
+
     cout << "Se puede mover a las siguientes opciones:" << endl;
     cout << "Seleccione 0 para cambiar de jugada" << endl;
     for(int i = 0 ; i < counter ; i++){ /** for para imprimir las opciones que tiene el usuario **/
@@ -1021,7 +1126,6 @@ void moverPeon(int iCord , int jCord, coordenadas *options){
         eleccionesJaque[i].x = options[i].x;
         eleccionesJaque[i].y = options[i].y;
     }
-
 
     igualarArrTemp();
 
@@ -1054,6 +1158,7 @@ void moverPeon(int iCord , int jCord, coordenadas *options){
             system("pause");
             igualarArr();
             board_set();
+            board_print();
             cout << "Se puede mover a las siguientes opciones:" << endl;
             cout << "Seleccione 0 para cambiar de jugada" << endl;
             cout << "Escriba \"patitogordito\" para rendirse" << endl;
@@ -1081,6 +1186,7 @@ void moverPeon(int iCord , int jCord, coordenadas *options){
         system("pause");
         system("cls");
         board_set();
+        board_print();
         moverPieza(options);
     }
 }
@@ -1202,6 +1308,11 @@ void moverAlfil(int iCord , int jCord, coordenadas *options){
         moverPieza(options);
         return;
     }
+
+    board_set(options, counter);
+    colors[iCord][jCord] = 2;
+    board_print();
+
     cout << "Se puede mover a las siguientes opciones:" << endl;
     cout << "Seleccione 0 para cambiar de jugada" << endl;
     for(int i = 0 ; i < counter ; i++){ /** for para imprimir las opciones que tiene el usuario **/
@@ -1247,6 +1358,7 @@ void moverAlfil(int iCord , int jCord, coordenadas *options){
             system("pause");
             igualarArr();
             board_set();
+            board_print();
             cout << "Se puede mover a las siguientes opciones:" << endl;
             cout << "Seleccione 0 para cambiar de jugada" << endl;
             cout << "Escriba \"patitogordito\" para rendirse" << endl;
@@ -1274,6 +1386,7 @@ void moverAlfil(int iCord , int jCord, coordenadas *options){
         system("pause");
         system("cls");
         board_set();
+        board_print();
         moverPieza(options);
     }
 }
@@ -1487,6 +1600,11 @@ void moverReina(int iCord , int jCord, coordenadas *options){
         moverPieza(options);
         return;
     }
+
+    board_set(options, counter);
+    colors[iCord][jCord] = 2;
+    board_print();
+
     cout << "Se puede mover a las siguientes opciones:" << endl;
     cout << "Seleccione 0 para cambiar de jugada" << endl;
     for(int i = 0 ; i < counter ; i++){ /** for para imprimir las opciones que tiene el usuario **/
@@ -1528,6 +1646,7 @@ void moverReina(int iCord , int jCord, coordenadas *options){
             system("pause");
             igualarArr();
             board_set();
+            board_print();
             cout << "Se puede mover a las siguientes opciones:" << endl;
             cout << "Seleccione 0 para cambiar de jugada" << endl;
             cout << "Escriba \"patitogordito\" para rendirse" << endl;
@@ -1555,6 +1674,7 @@ void moverReina(int iCord , int jCord, coordenadas *options){
         system("pause");
         system("cls");
         board_set();
+        board_print();
         moverPieza(options);
     }
 }
@@ -1660,6 +1780,11 @@ void moverRey(int iCord , int jCord, coordenadas *options){
         moverPieza(options);
         return;
     }
+
+    board_set(options, counter);
+    colors[iCord][jCord] = 2;
+    board_print();
+
     cout << "Se puede mover a las siguientes opciones:" << endl;
     cout << "Seleccione 0 para cambiar de jugada" << endl;
     for(int i = 0 ; i < counter ; i++){ /** for para imprimir las opciones que tiene el usuario **/
@@ -1705,6 +1830,7 @@ void moverRey(int iCord , int jCord, coordenadas *options){
             system("pause");
             igualarArr();
             board_set();
+            board_print();
             cout << "Se puede mover a las siguientes opciones:" << endl;
             cout << "Seleccione 0 para cambiar de jugada" << endl;
             cout << "Escriba \"patitogordito\" para rendirse" << endl;
@@ -1732,6 +1858,7 @@ void moverRey(int iCord , int jCord, coordenadas *options){
         system("pause");
         system("cls");
         board_set();
+        board_print();
         moverPieza(options);
     }
 }
@@ -2052,9 +2179,15 @@ void timesUp(){
     }
 }
 
+/**
+ *  Funcion: mensajeBienvenida
+ *
+ *  @Descripcion: Le da una calurosa bienvenida a los jugadores.
+ *  @Parametros: Nada.
+ *  @Retorna: Nada.
+**/
 
 void mensajeBienvenida(){
-
 
     //Dos lineas con "#"
     system("color 03");
